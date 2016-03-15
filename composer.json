@@ -14,11 +14,12 @@
     }
   ],
   "require": {
-    "php": ">=5.3.0"
+    "php": ">=5.3.0",
+    "ext-curl": "*"
   },
   "autoload": {
     "psr-0": {
-      "timenomad": "src"
+      "Timenomad": "src/"
     }
   }
 }
