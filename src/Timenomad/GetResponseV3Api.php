@@ -31,6 +31,16 @@ class GetResponseV3Api {
     protected $accessToken;
 
     /**
+     * @var string Token received after user's consent, used to renew an expired Access Token.
+     */
+    protected $refreshToken;
+
+    /**
+     * @var \Closure Anonymous function that gets called when an Access Token is renewed, this is where you save the new token to the database.
+     */
+    protected $accessTokenExpiryCallback;
+
+    /**
      * GetResponseV3Api constructor.
      * @param $clientId
      * @param $clientSecret
@@ -73,9 +83,27 @@ class GetResponseV3Api {
             trigger_error('No "state" GET parameter or returned value doesn\'t match the stored one.', E_USER_ERROR);
         }
         $response = $this->doHttpRequest(self::API_URL . '/token', true, [
-            "grant_type" => "authorization_code",
-            "code"       => $_GET['code']
+            'grant_type' => 'authorization_code',
+            'code'       => $_GET['code']
         ]);
+
+        return $response;
+    }
+
+    /**
+     * Use passed in Refresh Token to generate a new Access Token. (along with its related data.)
+     * Called automatically when an API request fails due to expired token.
+     * An Access Token is valid for 1 day.
+     *
+     * @return array The new token data
+     */
+    protected function renewAccessToken() {
+        $this->accessToken = null;
+        $response = $this->doHttpRequest(self::API_URL . '/token', true, [
+            'grant_type'    => 'refresh_token',
+            'refresh_token' => $this->refreshToken
+        ]);
+        $this->setAccessToken($response['access_token']);
 
         return $response;
     }
@@ -91,6 +119,15 @@ class GetResponseV3Api {
             trigger_error('No Access Token.', E_USER_ERROR);
         }
         $this->accessToken = $accessToken;
+    }
+
+    /**
+     * @param string $refreshToken The Refresh Token that you received in your previous call to get an Access Token
+     * @param \Closure $function Will be called when a new token is received, this is where you save the new token in the database.
+     */
+    public function setAccessTokenExpiryCallback($refreshToken, \Closure $function) {
+        $this->refreshToken = $refreshToken;
+        $this->accessTokenExpiryCallback = $function;
     }
 
     //
@@ -170,17 +207,18 @@ class GetResponseV3Api {
         } else {
             $authHeader = "Authorization: Basic " . base64_encode("{$this->clientId}:{$this->clientSecret}");
         }
+        $fullUrl = $url;
 
         // if GET and got payload - send as query params
         if (!$isPost && !empty($payload)) {
-            $url .= '?' . http_build_query($payload);
+            $fullUrl .= '?' . http_build_query($payload);
         }
-        $ch = curl_init($url);
+        $ch = curl_init($fullUrl);
 
         curl_setopt_array($ch, [
             CURLOPT_HTTPHEADER     => [
                 $authHeader,
-                "Content-Type: application/json"
+                'Content-Type: application/json'
             ],
             CURLOPT_POST           => $isPost,
             CURLOPT_RETURNTRANSFER => true
@@ -194,11 +232,31 @@ class GetResponseV3Api {
 
         // GetResponse returned an error
         if (isset($response['code']) && isset($response['message'])) {
-            echo '<pre>';
-            var_dump($response);
-            exit;
+            // If Access Token expired, use Refresh Token to generate a new one
+            if ((int)$response['code'] === 1014) {
+                if (!$this->accessTokenExpiryCallback || !$this->refreshToken) {
+                    trigger_error('No callback for Access Token expiry and/or Refresh Token defined, cannot renew Access Token.', E_USER_ERROR);
+                }
+                // Automatically renew token and call user's callback function
+                $newToken = $this->renewAccessToken();
+                $this->accessTokenExpiryCallback->__invoke($newToken);
+                return $this->doHttpRequest($url, $isPost, $payload);
+            } else {
+                $this->showError($response);
+            }
         }
 
         return $response;
+    }
+
+    /**
+     * Output a formatted error.
+     *
+     * @param $error
+     */
+    private function showError($error) {
+        echo '<pre>';
+        var_dump($error);
+        exit;
     }
 }
