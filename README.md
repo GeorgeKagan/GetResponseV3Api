@@ -17,7 +17,7 @@ A read-only PHP wrapper for the GetResponse V3 API, supporting OAuth2 authorizat
 * Having the token, we can now configure the authentication and begin calling the API:  
   `$getResponse->setAccessToken($token['access_token']);`  
   `$getResponse->setAccessTokenExpiryCallback($token['refresh_token'], function($newTokenData) {`  
-      `// Access Token expired. This function will be called after a new token has been generated.`  
-      `// Here you can save the new token data to the database, or any other storage means.`  
+        `// Access Token expired. This function will be called after a new token has been generated.`  
+        `// Here you can save the new token data to the database, or any other storage means.`  
   `});`  
 
