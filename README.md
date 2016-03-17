@@ -20,4 +20,7 @@ A read-only PHP wrapper for the GetResponse V3 API, supporting OAuth2 authorizat
         `// Access Token expired. This function will be called after a new token has been generated.`  
         `// Here you can save the new token data to the database, or any other storage means.`  
   `});`  
-
+* We can now call the API!  
+  `$userInfo = $getResponse->getAccountInfo();`  
+  `$campaigns = $getResponse->getCampaigns();`  
+  `$statistics = $getResponse->getCampaignStatistics();`  
