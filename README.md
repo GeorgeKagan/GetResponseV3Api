@@ -8,9 +8,8 @@ A read-only PHP wrapper for the GetResponse V3 API, supporting OAuth2 authorizat
 
 # Usage
 * Install via composer: `composer require timenomad/getresponse-v3-api`
-* Init API object: `$getResponse = new \Timenomad\GetResponseV3Api("*Client ID*", "*Client Secret*", "*State*");`.
-  
-  State is just a random combination of characters, to validate that the callback's origin is GetResponse. It's a static value.
+* Init API object: `$getResponse = new \Timenomad\GetResponseV3Api("*Client ID*", "*Client Secret*", "*State*");`.  
+  State is just a random combination of characters, to validate callback's origin. It's a static value.  
   An example would be: fdsfjhs3SDGg23refsd2u09@$
 * Get OAuth2 user consent URL: `$getResponse->getOAuthConsentUrl()`
 * When user approves and your callback URL is called: `$accessToken = $getResponse->getAccessToken();`
