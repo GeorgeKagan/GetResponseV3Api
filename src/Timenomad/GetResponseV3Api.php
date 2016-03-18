@@ -68,6 +68,10 @@ class GetResponseV3Api {
         return $response;
     }
 
+    ///////////////
+    // Campaigns //
+    ///////////////
+
     /**
      * Returns authenticated user's campaigns
      *
@@ -75,6 +79,24 @@ class GetResponseV3Api {
      */
     public function getCampaigns() {
         $response = $this->doHttpRequest(self::API_URL . '/campaigns');
+
+        return $response;
+    }
+
+    public function getCampaign($campaignId) {
+        $response = $this->doHttpRequest(self::API_URL . '/campaigns/' . $campaignId);
+
+        return $response;
+    }
+
+    public function getCampaignContacts($campaignId) {
+        $response = $this->doHttpRequest(self::API_URL . '/campaigns/' . $campaignId . '/contacts');
+
+        return $response;
+    }
+
+    public function getCampaignBlacklists($campaignId) {
+        $response = $this->doHttpRequest(self::API_URL . '/campaigns/' . $campaignId . '/blacklists');
 
         return $response;
     }
@@ -108,6 +130,34 @@ class GetResponseV3Api {
             $payload['fields'] = $fields;
         }
         $response = $this->doHttpRequest(self::API_URL . '/campaigns/statistics/' . $metric, false, $payload);
+
+        return $response;
+    }
+
+    /////////////////
+    // Newsletters //
+    /////////////////
+
+    public function getNewsletters($campaignId = null, $fromTime = null, $toTime = null, $fields = null) {
+        $payload = [];
+
+        if ($campaignId) {
+            $payload['query[campaignId]'] = $campaignId;
+        }
+        if ($fromTime && $toTime) {
+            $payload['query[createdOn][from]'] = strftime('%Y-%m-%d', strtotime($fromTime) ? strtotime($fromTime) : $fromTime);
+            $payload['query[createdOn][to]'] = strftime('%Y-%m-%d', strtotime($toTime) ? strtotime($toTime) : $toTime);
+        }
+        if (!empty($fields)) {
+            $payload['fields'] = $fields;
+        }
+        $response = $this->doHttpRequest(self::API_URL . '/newsletters', false, $payload);
+
+        return $response;
+    }
+
+    public function getNewsletter($newsletterId) {
+        $response = $this->doHttpRequest(self::API_URL . '/newsletters/' . $newsletterId);
 
         return $response;
     }

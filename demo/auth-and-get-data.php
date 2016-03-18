@@ -45,10 +45,24 @@ $getResponse->setAccessTokenExpiryCallback($token['refresh_token'], function($ne
     file_put_contents('token.txt', json_encode($newTokenData));
 });
 
-// API methods:
+// API methods
+
+// User
 $userInfo = $getResponse->getAccountInfo();
+
+// Campaigns
 $campaigns = $getResponse->getCampaigns();
+$campaign = $getResponse->getCampaign($campaigns[0]['campaignId']);
+$cpnContacts = $getResponse->getCampaignContacts($campaigns[0]['campaignId']);
+$cpnBlacklists = $getResponse->getCampaignBlacklists($campaigns[0]['campaignId']);
+// 2nd param one of: list-size, locations, origins, removals, subscriptions, balance, summary
 $statistics = $getResponse->getCampaignStatistics($campaigns[0]['campaignId'], 'list-size');
+
+// Newsletters
+$newsletters = $getResponse->getNewsletters($campaigns[0]['campaignId']);
+$newsletter = $getResponse->getNewsletter($newsletters[0]['newsletterId']);
+
+//todo: continue with newsletters statistics
 
 // Echo away...
 dd($statistics);
