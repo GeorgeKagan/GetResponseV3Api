@@ -46,6 +46,10 @@ trait Http {
         }
         $response = json_decode(curl_exec($ch), true);
 
+        if (curl_error($ch)) {
+            trigger_error(curl_error($ch), E_USER_ERROR);
+        }
+
         // GetResponse returned an error
         if (isset($response['code']) && isset($response['message'])) {
             // If Access Token expired, use Refresh Token to generate a new one
