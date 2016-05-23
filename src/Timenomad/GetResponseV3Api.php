@@ -46,15 +46,22 @@ class GetResponseV3Api {
     protected $accessTokenExpiryCallback;
 
     /**
+     * @var bool Whether to verify SSL certificate or not. NOT for production use!
+     */
+    protected $bypassSSL;
+
+    /**
      * GetResponseV3Api constructor.
      * @param $clientId
      * @param $clientSecret
      * @param $state
+     * @param $bypassSSL
      */
-    public function __construct($clientId, $clientSecret, $state) {
+    public function __construct($clientId, $clientSecret, $state, $bypassSSL = false) {
         $this->clientId     = $clientId;
         $this->clientSecret = $clientSecret;
         $this->state        = $state;
+        $this->bypassSSL    = $bypassSSL;
     }
 
     /**

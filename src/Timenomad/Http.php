@@ -44,6 +44,11 @@ trait Http {
         if ($isPost && !empty($payload)) {
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
         }
+        // If set to not verify SSL certificate (for DEV only)
+        if ($this->bypassSSL) {
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        }
         $response = json_decode(curl_exec($ch), true);
 
         if (curl_error($ch)) {
