@@ -24,3 +24,8 @@ A read-only PHP wrapper for the GetResponse V3 API, supporting OAuth2 authorizat
   `$userInfo = $getResponse->getAccountInfo();`  
   `$campaigns = $getResponse->getCampaigns();`  
   `$statistics = $getResponse->getCampaignStatistics();`  
+
+# SSL Verification
+For development purposes, it can be handy to disable curl's SSL certificate verification, to do so, instantiate the API wrapper object like so (4th param sets to bypass verfification):
+
+GetResponseV3Api(x, y, z, *true*)
